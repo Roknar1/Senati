@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#08090c">
+  <meta name="description" content="Pantalla de acceso del portal académico.">
+  <title>Iniciar sesión | Portal</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #08090c;
+      color: #f5f7fb;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      --muted: #9299a8;
+      --line: rgba(255,255,255,.10);
+      --accent: #8b9cff;
+      --accent-strong: #7187ff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 32px 20px;
+      overflow-x: hidden;
+      background:
+        radial-gradient(ellipse at 16% 12%, rgba(70,91,190,.16), transparent 34rem),
+        radial-gradient(ellipse at 88% 85%, rgba(81,54,145,.14), transparent 32rem),
+        #08090c;
+    }
+    .ambient {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .20;
+      background-image: linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 54px 54px;
+      mask-image: linear-gradient(to bottom, black, transparent 78%);
+    }
+    .shell { position: relative; width: min(100%, 440px); }
+    .brand {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    .brand-mark {
+      width: 42px; height: 42px;
+      display: grid; place-items: center;
+      border: 1px solid rgba(161,175,255,.35);
+      border-radius: 13px;
+      background: linear-gradient(145deg, rgba(139,156,255,.25), rgba(139,156,255,.04));
+      color: #dce2ff;
+      font-size: 20px; font-weight: 800;
+      box-shadow: 0 8px 30px rgba(91,111,235,.14);
+    }
+    .brand-name { font-size: 13px; font-weight: 800; letter-spacing: .20em; }
+    .brand-caption { margin-top: 3px; color: var(--muted); font-size: 10px; letter-spacing: .16em; }
+    .card {
+      padding: clamp(27px, 7vw, 40px);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: linear-gradient(150deg, rgba(22,24,32,.97), rgba(13,14,19,.98));
+      box-shadow: 0 28px 90px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.035);
+      backdrop-filter: blur(16px);
+    }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: #b8c1ff; font-size: 10px; font-weight: 750; letter-spacing: .17em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before { content: ""; width: 18px; height: 1px; background: var(--accent); }
+    h1 { margin: 17px 0 9px; font-size: clamp(27px, 6vw, 34px); line-height: 1.12; letter-spacing: -.045em; }
+    .intro { margin: 0 0 30px; color: var(--muted); font-size: 14px; line-height: 1.65; }
+    .field { margin-top: 19px; }
+    .field-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 9px; }
+    label { color: #e3e6ef; font-size: 12px; font-weight: 650; }
+    .input-wrap { position: relative; }
+    input[type="email"], input[type="password"], input[type="text"] {
+      width: 100%; height: 51px; padding: 0 15px;
+      border: 1px solid rgba(255,255,255,.11); border-radius: 11px;
+      outline: none; background: rgba(5,6,10,.58); color: #f6f7fb;
+      font: inherit; font-size: 13px; transition: border-color .18s, box-shadow .18s, background .18s;
+    }
+    input::placeholder { color: #626979; }
+    input:focus { border-color: rgba(139,156,255,.8); background: rgba(9,11,18,.9); box-shadow: 0 0 0 3px rgba(139,156,255,.12); }
+    input[aria-invalid="true"] { border-color: #f17886; }
+    .password-input { padding-right: 58px !important; }
+    .toggle-password {
+      position: absolute; top: 50%; right: 9px; transform: translateY(-50%);
+      padding: 7px 8px; border: 0; border-radius: 7px; background: transparent;
+      color: #9ba3b5; font-size: 11px; cursor: pointer;
+    }
+    .toggle-password:hover { color: white; background: rgba(255,255,255,.06); }
+    .options { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 18px 0 23px; }
+    .remember { display: inline-flex; align-items: center; gap: 8px; color: #aeb4c2; font-size: 11px; cursor: pointer; }
+    .remember input { width: 14px; height: 14px; margin: 0; accent-color: var(--accent-strong); }
+    a { color: #aab7ff; font-size: 11px; text-decoration: none; }
+    a:hover { color: #d4dbff; text-decoration: underline; }
+    .submit {
+      width: 100%; height: 51px; display: flex; align-items: center; justify-content: center; gap: 10px;
+      border: 0; border-radius: 11px; color: #090b14;
+      background: linear-gradient(105deg, #c0caff, #899dff 55%, #a6b2ff);
+      font: inherit; font-size: 13px; font-weight: 800; cursor: pointer;
+      box-shadow: 0 9px 26px rgba(111,133,255,.20);
+      transition: transform .18s, box-shadow .18s, filter .18s;
+    }
+    .submit:hover { transform: translateY(-1px); filter: brightness(1.04); box-shadow: 0 13px 30px rgba(111,133,255,.28); }
+    .submit:active { transform: translateY(0); }
+    .submit:focus-visible, .toggle-password:focus-visible, a:focus-visible { outline: 2px solid #d2d9ff; outline-offset: 3px; }
+    .arrow { font-size: 17px; line-height: 1; }
+    .status {
+      display: none; margin-top: 16px; padding: 12px 13px;
+      border: 1px solid rgba(241,185,104,.28); border-radius: 9px;
+      background: rgba(241,185,104,.07); color: #f2d5a6;
+      font-size: 11px; line-height: 1.55;
+    }
+    .status.visible { display: block; }
+    .divider { height: 1px; margin: 25px 0 19px; background: var(--line); }
+    .secure-note { display: flex; justify-content: center; align-items: center; gap: 7px; color: #737b8c; font-size: 10px; }
+    .secure-note svg { width: 13px; height: 13px; }
+    .footer { margin-top: 23px; color: #686f7e; text-align: center; font-size: 10px; line-height: 1.7; }
+    @media (max-width: 420px) {
+      body { padding: 22px 14px; }
+      .brand { margin-bottom: 21px; }
+      .card { border-radius: 18px; }
+      .options { align-items: flex-start; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient" aria-hidden="true"></div>
+  <main class="shell">
+    <header class="brand" aria-label="Portal académico">
+      <div class="brand-mark" aria-hidden="true">S</div>
+      <div>
+        <div class="brand-name">SENATI</div>
+        <div class="brand-caption">PORTAL ACADÉMICO</div>
+      </div>
+    </header>
+
+    <section class="card" aria-labelledby="login-title">
+      <div class="eyebrow">Acceso seguro</div>
+      <h1 id="login-title">Bienvenido de nuevo</h1>
+      <p class="intro">Ingresa tus datos para continuar a tu espacio de trabajo.</p>
+
+      <form id="login-form" novalidate>
+        <div class="field">
+          <div class="field-head"><label for="email">Correo electrónico</label></div>
+          <input id="email" name="email" type="email" autocomplete="username"
+                 placeholder="nombre@correo.com" required aria-describedby="form-status">
+        </div>
+
+        <div class="field">
+          <div class="field-head"><label for="password">Contraseña</label></div>
+          <div class="input-wrap">
+            <input class="password-input" id="password" name="password" type="password"
+                   autocomplete="current-password" placeholder="Ingresa tu contraseña"
+                   required aria-describedby="form-status">
+            <button class="toggle-password" id="toggle-password" type="button"
+                    aria-label="Mostrar contraseña" aria-pressed="false">Mostrar</button>
+          </div>
+        </div>
+
+        <div class="options">
+          <label class="remember"><input id="remember" name="remember" type="checkbox"> Recordarme</label>
+          <a href="#recuperacion" id="forgot-link">¿Olvidaste tu contraseña?</a>
+        </div>
+
+        <button class="submit" type="submit">
+          <span>Iniciar sesión</span><span class="arrow" aria-hidden="true">→</span>
+        </button>
+        <div class="status" id="form-status" role="status" aria-live="polite"></div>
+      </form>
+
+      <div class="divider"></div>
+      <div class="secure-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+          <rect x="4.5" y="10" width="15" height="11" rx="2"></rect>
+          <path d="M8 10V7a4 4 0 0 1 8 0v3"></path>
+          <path d="M12 14v3"></path>
+        </svg>
+        Tu sesión estará protegida cuando se conecte el servidor.
+      </div>
+    </section>
+
+    <footer class="footer">© <span id="year"></span> Portal académico · Todos los derechos reservados</footer>
+  </main>
+  <script>
+    const form = document.querySelector("#login-form");
+    const email = document.querySelector("#email");
+    const password = document.querySelector("#password");
+    const statusBox = document.querySelector("#form-status");
+    const toggle = document.querySelector("#toggle-password");
+
+    document.querySelector("#year").textContent = new Date().getFullYear();
+
+    function showStatus(message) {
+      statusBox.textContent = message;
+      statusBox.classList.add("visible");
+    }
+
+    function clearError(input) {
+      input.removeAttribute("aria-invalid");
+    }
+
+    [email, password].forEach((input) => {
+      input.addEventListener("input", () => {
+        clearError(input);
+        statusBox.classList.remove("visible");
+      });
+    });
+
+    toggle.addEventListener("click", () => {
+      const showing = password.type === "text";
+      password.type = showing ? "password" : "text";
+      toggle.textContent = showing ? "Mostrar" : "Ocultar";
+      toggle.setAttribute("aria-label", showing ? "Mostrar contraseña" : "Ocultar contraseña");
+      toggle.setAttribute("aria-pressed", String(!showing));
+      password.focus();
+    });
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      let valid = true;
+
+      if (!email.value.trim() || !email.validity.valid) {
+        email.setAttribute("aria-invalid", "true");
+        valid = false;
+      }
+      if (!password.value) {
+        password.setAttribute("aria-invalid", "true");
+        valid = false;
+      }
+
+      if (!valid) {
+        showStatus("Revisa tu correo electrónico y tu contraseña para continuar.");
+        return;
+      }
+
+      showStatus("La interfaz está lista, pero todavía no hay un servidor de autenticación conectado. No se ha iniciado sesión ni se han enviado tus datos.");
+    });
+
+    document.querySelector("#forgot-link").addEventListener("click", (event) => {
+      event.preventDefault();
+      showStatus("La recuperación de contraseña estará disponible cuando se configure el servicio de autenticación.");
+    });
+  </script>
+</body>
+</html>
